@@ -15,7 +15,7 @@ public class Prisao {
     private int quantidadeGuardas;
 
     private Prisao() {
-        this.DELEGADO = new Delegado(1, "Delegado Padrão", "0000-0000", "delegado@padrao.com", "12345");
+        this.DELEGADO = new Delegado(1, "Leonardo", "0000-0000", "leo@gmail.com", "12345");
         this.BLOCOS = new ArrayList<>();
         this.quantidadeGuardas = 0;
         this.quantidadePresos = 0;

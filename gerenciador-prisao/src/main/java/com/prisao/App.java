@@ -1,10 +1,9 @@
 package com.prisao;
 
-import com.prisao.visao.menu.Menu;
+import com.prisao.visao.login.LoginUI;
 
 public class App {
-
     public static void main(String[] args) {
-        Menu.inicializaMenu();
+        new LoginUI().criarTelaLogin();
     }
 }
