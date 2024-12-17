@@ -1,5 +1,6 @@
 package com.prisao.controle.gerenciamento.local;
 
+import com.prisao.controle.persistencia.BackupManager;
 import com.prisao.modelo.local.Bloco;
 import com.prisao.modelo.local.Prisao;
 
@@ -20,7 +21,8 @@ public class GerenciaBlocos {
             return false;
         }
 
-        Prisao.getInstancia().getBlocos().add(new Bloco(identificador));
+        if(Prisao.getInstancia().getBlocos().add(new Bloco(identificador)))
+            BackupManager.salvarBackup(Prisao.getInstancia());
 
         return true;
     }
@@ -31,7 +33,8 @@ public class GerenciaBlocos {
             return false;
         }
 
-        Prisao.getInstancia().getBlocos().remove(bloco);
+        if(Prisao.getInstancia().getBlocos().remove(bloco))
+            BackupManager.salvarBackup(Prisao.getInstancia());
 
         return true;
     }

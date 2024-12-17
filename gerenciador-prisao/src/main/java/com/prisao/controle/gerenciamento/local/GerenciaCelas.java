@@ -1,5 +1,6 @@
 package com.prisao.controle.gerenciamento.local;
 
+import com.prisao.controle.persistencia.BackupManager;
 import com.prisao.modelo.local.Bloco;
 import com.prisao.modelo.local.Cela;
 import com.prisao.modelo.local.Prisao;
@@ -28,7 +29,11 @@ public class GerenciaCelas {
 
         cela = new Cela(identificadorCela, capacidadeMaxima, nivelSeguranca);
 
-        return bloco.insereCela(cela);
+        if(bloco.insereCela(cela)){
+            BackupManager.salvarBackup(Prisao.getInstancia());
+            return true;
+        }
+        return false;
     }
 
     public static boolean removerCela(int identificadorCela){
@@ -36,6 +41,7 @@ public class GerenciaCelas {
             for(Cela celaAtual : blocoAtual.getCelas()){
                 if(celaAtual.getIdentificador() == identificadorCela){
                     blocoAtual.getCelas().remove(celaAtual);
+                    BackupManager.salvarBackup(Prisao.getInstancia());
                     return true;
                 }
             }

@@ -1,4 +1,4 @@
-package com.prisao.visao.local;
+package com.prisao.visao.gerenciamento.local;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -15,35 +15,32 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import com.prisao.controle.gerenciamento.local.GerenciaBlocos;
-import com.prisao.modelo.local.Bloco;
+import com.prisao.controle.gerenciamento.local.GerenciaCelas;
 import com.prisao.modelo.local.Cela;
-import com.prisao.modelo.pessoa.Guarda;
+import com.prisao.modelo.pessoa.Prisioneiro;
 
-public class GerenciaBlocosUI extends JFrame {
+public class GerenciaCelasUI extends JFrame {
 
-    public GerenciaBlocosUI() {
-        setTitle("Gerenciamento de Blocos");
+    public GerenciaCelasUI() {
+        setTitle("Gerenciamento de Celas");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 600);
+        setSize(500, 400);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Painel principal
         JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
 
-        // Seção: Pesquisar Bloco
         JPanel pesquisarPanel = new JPanel(new BorderLayout());
-        pesquisarPanel.setBorder(BorderFactory.createTitledBorder("Pesquisar Bloco"));
+        pesquisarPanel.setBorder(BorderFactory.createTitledBorder("Pesquisar Cela"));
 
         JPanel inputPesquisarPanel = new JPanel(new FlowLayout());
         JTextField txtPesquisarId = new JTextField(10);
         JButton btnPesquisar = new JButton("Pesquisar");
-        inputPesquisarPanel.add(new JLabel("ID do Bloco:"));
+        inputPesquisarPanel.add(new JLabel("ID da Cela:"));
         inputPesquisarPanel.add(txtPesquisarId);
         inputPesquisarPanel.add(btnPesquisar);
 
-        JTextArea resultadoPesquisa = new JTextArea(15, 50);
+        JTextArea resultadoPesquisa = new JTextArea(10, 40);
         resultadoPesquisa.setEditable(false);
         resultadoPesquisa.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         JScrollPane scrollPane = new JScrollPane(resultadoPesquisa);
@@ -55,46 +52,64 @@ public class GerenciaBlocosUI extends JFrame {
             int id;
             try {
                 id = Integer.parseInt(txtPesquisarId.getText());
-                Bloco bloco = GerenciaBlocos.pesquisarBloco(id);
+                Cela cela = GerenciaCelas.pesquisarCela(id);
         
-                if (bloco != null) {
-                    resultadoPesquisa.setText(formatarDadosBloco(bloco));
+                if (cela != null) {
+                    resultadoPesquisa.setText(formatarDadosCela(cela));
                 } else {
-                    resultadoPesquisa.setText("Bloco não encontrado.");
+                    resultadoPesquisa.setText("Cela não encontrada.");
                 }
             } catch (NumberFormatException ex) {
                 resultadoPesquisa.setText("ID inválido.");
+            } finally {
+                txtPesquisarId.setText("");
             }
-            txtPesquisarId.setText("");
         });
 
         panel.add(pesquisarPanel);
 
-        JPanel cadastrarPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-        cadastrarPanel.setBorder(BorderFactory.createTitledBorder("Cadastrar Bloco"));
+        JPanel cadastrarPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+        cadastrarPanel.setBorder(BorderFactory.createTitledBorder("Cadastrar Cela"));
 
-        JTextField txtCadastrarId = new JTextField();
+        JTextField txtBlocoId = new JTextField();
+        JTextField txtCelaId = new JTextField();
+        JTextField txtCapacidade = new JTextField();
+        JTextField txtNivelSeguranca = new JTextField();
         JButton btnCadastrar = new JButton("Cadastrar");
         JLabel lblCadastrarResultado = new JLabel();
 
         cadastrarPanel.add(new JLabel("ID do Bloco:"));
-        cadastrarPanel.add(txtCadastrarId);
+        cadastrarPanel.add(txtBlocoId);
+        cadastrarPanel.add(new JLabel("ID da Cela:"));
+        cadastrarPanel.add(txtCelaId);
+        cadastrarPanel.add(new JLabel("Capacidade Máxima:"));
+        cadastrarPanel.add(txtCapacidade);
+        cadastrarPanel.add(new JLabel("Nível de Segurança:"));
+        cadastrarPanel.add(txtNivelSeguranca);
         cadastrarPanel.add(btnCadastrar);
         cadastrarPanel.add(lblCadastrarResultado);
 
         btnCadastrar.addActionListener(e -> {
             try {
-                int id = Integer.parseInt(txtCadastrarId.getText());
-                boolean sucesso = GerenciaBlocos.cadastrarBloco(id);
+                int blocoId = Integer.parseInt(txtBlocoId.getText());
+                int celaId = Integer.parseInt(txtCelaId.getText());
+                int capacidade = Integer.parseInt(txtCapacidade.getText());
+                String nivelSeguranca = txtNivelSeguranca.getText();
+        
+                boolean sucesso = GerenciaCelas.cadastrarCela(blocoId, celaId, capacidade, nivelSeguranca);
                 if (sucesso) {
-                    lblCadastrarResultado.setText("Bloco cadastrado com sucesso!");
+                    lblCadastrarResultado.setText("Cela cadastrada com sucesso!");
                 } else {
-                    lblCadastrarResultado.setText("Falha ao cadastrar bloco. ID já existe.");
+                    lblCadastrarResultado.setText("Falha ao cadastrar cela.");
                 }
             } catch (NumberFormatException ex) {
-                lblCadastrarResultado.setText("ID inválido.");
+                lblCadastrarResultado.setText("Dados inválidos.");
+            } finally {
+                txtBlocoId.setText("");
+                txtCelaId.setText("");
+                txtCapacidade.setText("");
+                txtNivelSeguranca.setText("");
             }
-            txtCadastrarId.setText("");
 
             javax.swing.Timer timer = new javax.swing.Timer(3000, ev -> lblCadastrarResultado.setText(""));
             timer.setRepeats(false);
@@ -104,13 +119,11 @@ public class GerenciaBlocosUI extends JFrame {
         panel.add(cadastrarPanel);
 
         JPanel removerPanel = new JPanel(new FlowLayout());
-        removerPanel.setBorder(BorderFactory.createTitledBorder("Remover Bloco"));
-
+        removerPanel.setBorder(BorderFactory.createTitledBorder("Remover Cela"));
         JTextField txtRemoverId = new JTextField(10);
         JButton btnRemover = new JButton("Remover");
         JLabel lblRemoverResultado = new JLabel();
-
-        removerPanel.add(new JLabel("ID do Bloco:"));
+        removerPanel.add(new JLabel("ID da Cela:"));
         removerPanel.add(txtRemoverId);
         removerPanel.add(btnRemover);
         removerPanel.add(lblRemoverResultado);
@@ -118,16 +131,17 @@ public class GerenciaBlocosUI extends JFrame {
         btnRemover.addActionListener(e -> {
             try {
                 int id = Integer.parseInt(txtRemoverId.getText());
-                boolean sucesso = GerenciaBlocos.removerBloco(id);
+                boolean sucesso = GerenciaCelas.removerCela(id);
                 if (sucesso) {
-                    lblRemoverResultado.setText("Bloco removido com sucesso!");
+                    lblRemoverResultado.setText("Cela removida com sucesso!");
                 } else {
-                    lblRemoverResultado.setText("Falha ao remover bloco. Bloco não encontrado.");
+                    lblRemoverResultado.setText("Falha ao remover cela.");
                 }
             } catch (NumberFormatException ex) {
                 lblRemoverResultado.setText("ID inválido.");
+            } finally {
+                txtRemoverId.setText("");
             }
-            txtRemoverId.setText("");
 
             javax.swing.Timer timer = new javax.swing.Timer(3000, ev -> lblRemoverResultado.setText(""));
             timer.setRepeats(false);
@@ -141,42 +155,27 @@ public class GerenciaBlocosUI extends JFrame {
         setVisible(true);
     }
 
-    private String formatarDadosBloco(Bloco bloco) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("IDENTIFICADOR DO BLOCO: ").append(bloco.getIdentificador()).append("\n");
-
-        sb.append("GUARDAS NO BLOCO:\n");
-        List<Guarda> guardas = bloco.getGuardas();
-        if (!guardas.isEmpty()) {
-            for (Guarda guarda : guardas) {
-                sb.append("\t- ").append(guarda.toString()).append("\n");
-            }
-        } else {
-            sb.append("\tNenhum guarda no bloco.\n");
-        }
-
-        sb.append("CELAS EXISTENTES NO BLOCO:\n");
-        List<Cela> celas = bloco.getCelas();
-        if (!celas.isEmpty()) {
-            for (Cela cela : celas) {
-                sb.append("\t").append(formatarDadosCela(cela)).append("\n");
-            }
-        } else {
-            sb.append("\tNenhuma cela no bloco.\n");
-        }
-
-        return sb.toString();
-    }
-
     private String formatarDadosCela(Cela cela) {
         StringBuilder sb = new StringBuilder();
-        sb.append("IDENTIFICADOR DA CELA: ").append(cela.getIdentificador()).append("; ");
+        sb.append("IDENTIFICADOR DA CELA: ").append(cela.getIdentificador()).append("\n");
         sb.append("CAPACIDADE MÁXIMA: (")
           .append(cela.getPrisioneiros().size())
           .append("/")
           .append(cela.getCapacidadeMaxima())
-          .append("); ");
-        sb.append("NÍVEL DE SEGURANÇA: ").append(cela.getNivelSeguranca());
+          .append(")\n");
+        sb.append("NÍVEL DE SEGURANÇA: ").append(cela.getNivelSeguranca()).append("\n");
+        sb.append("LISTA DE PRISIONEIROS:\n");
+
+        List<Prisioneiro> prisioneiros = cela.getPrisioneiros();
+        if (!prisioneiros.isEmpty()) {
+            for (Prisioneiro prisioneiro : prisioneiros) {
+                sb.append("\t- ").append(prisioneiro.toString()).append("\n");
+            }
+        } else {
+            sb.append("\tNenhum prisioneiro.\n");
+        }
+
         return sb.toString();
     }
+
 }

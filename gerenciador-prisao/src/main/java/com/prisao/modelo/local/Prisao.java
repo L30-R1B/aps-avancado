@@ -3,8 +3,8 @@ package com.prisao.modelo.local;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.prisao.controle.persistencia.BackupManager;
 import com.prisao.modelo.pessoa.Delegado;
-
 
 public class Prisao {
     private static Prisao instanciaUnica;
@@ -15,7 +15,7 @@ public class Prisao {
     private int quantidadeGuardas;
 
     private Prisao() {
-        this.DELEGADO = new Delegado(1, "Leonardo", "0000-0000", "leo@gmail.com", "12345");
+        this.DELEGADO = new Delegado(1, "Matheus", "0000-0000", "delegado@gmail.com", "12345");
         this.BLOCOS = new ArrayList<>();
         this.quantidadeGuardas = 0;
         this.quantidadePresos = 0;
@@ -23,7 +23,11 @@ public class Prisao {
 
     public static Prisao getInstancia() {
         if (instanciaUnica == null) {
-            instanciaUnica = new Prisao();
+            instanciaUnica = BackupManager.carregarBackup();
+            
+            if (instanciaUnica == null) {
+                instanciaUnica = new Prisao();
+            }
         }
         return instanciaUnica;
     }

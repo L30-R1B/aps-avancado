@@ -1,6 +1,6 @@
 package com.prisao.modelo.pessoa;
 
-public class Individuo {
+public class Individuo{
     private final int IDENTIFICADOR;
     private final String NOME;
 

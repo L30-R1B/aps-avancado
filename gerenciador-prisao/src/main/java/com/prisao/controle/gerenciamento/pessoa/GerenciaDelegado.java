@@ -1,5 +1,6 @@
 package com.prisao.controle.gerenciamento.pessoa;
 
+import com.prisao.controle.persistencia.BackupManager;
 import com.prisao.modelo.local.Prisao;
 
 public class GerenciaDelegado {
@@ -29,6 +30,7 @@ public class GerenciaDelegado {
     public boolean mudarSenha(String email, String senhaNova){
         if(verificaEmail(email)){
             Prisao.getInstancia().getDelegado().setSenha(senhaNova);
+            BackupManager.salvarBackup(Prisao.getInstancia());
             return true;
         }
 

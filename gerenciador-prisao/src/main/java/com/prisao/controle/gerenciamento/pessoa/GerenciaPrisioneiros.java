@@ -1,6 +1,7 @@
 package com.prisao.controle.gerenciamento.pessoa;
 
 import com.prisao.controle.gerenciamento.local.GerenciaCelas;
+import com.prisao.controle.persistencia.BackupManager;
 import com.prisao.modelo.local.Bloco;
 import com.prisao.modelo.local.Cela;
 import com.prisao.modelo.local.Prisao;
@@ -33,6 +34,7 @@ public class GerenciaPrisioneiros {
         }
         
         cela.inserePrisioneiro(new Prisioneiro(identificadorPrisioneiro, nome, crime, pena, comportamento));
+        BackupManager.salvarBackup(Prisao.getInstancia());
 
         return true;
     }
@@ -46,6 +48,7 @@ public class GerenciaPrisioneiros {
         for(Bloco blocoAtual : Prisao.getInstancia().getBlocos()){
             for(Cela celaAtual : blocoAtual.getCelas()){
                 if(celaAtual.removePrisioneiro(identificador)){
+                    BackupManager.salvarBackup(Prisao.getInstancia());
                     return true;
                 }
             }
@@ -66,6 +69,7 @@ public class GerenciaPrisioneiros {
             Prisioneiro prisioAux = new Prisioneiro(prisioneiro.getIdentificador(), prisioneiro.getNome(), prisioneiro.getCrime(), prisioneiro.getPena(), prisioneiro.getComportamento());
             desvincularPrisioneiro(identificadorPrisioneiro);
             cadastrarPrisioneiro(prisioAux.getIdentificador(), identificadorNovaCela, prisioAux.getNome(), prisioAux.getCrime(), prisioAux.getPena(), prisioAux.getComportamento());
+            BackupManager.salvarBackup(Prisao.getInstancia());
             return true;
         }
 
@@ -79,6 +83,7 @@ public class GerenciaPrisioneiros {
         }
 
         prisioneiro.setComportamento(novoComportamento);
+        BackupManager.salvarBackup(Prisao.getInstancia());
         return true;
     }
 
@@ -89,6 +94,7 @@ public class GerenciaPrisioneiros {
         }
 
         prisioneiro.setPena(prisioneiro.getPena() + valorAumentoPena);
+        BackupManager.salvarBackup(Prisao.getInstancia());
         return true;
     }
 
@@ -101,8 +107,9 @@ public class GerenciaPrisioneiros {
         prisioneiro.setPena(prisioneiro.getPena() - valorReducaoPena);
 
         if(prisioneiro.getPena() < 0.0){
-            System.out.println("Prisioneiro já cumpriu sua pena");
+            System.out.println("Prisioneiro " + prisioneiro.getNome() + " já cumpriu sua pena, portanto será removido do sistema.");
             desvincularPrisioneiro(identificadorPrisioneiro);
+            BackupManager.salvarBackup(Prisao.getInstancia());
         }
 
         return true;
