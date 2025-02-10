@@ -66,7 +66,7 @@ public class GerenciaDadosAleatorios {
     public static void preencherPrisaoComPseudodados(int n) {
         Random random = new Random();
 
-        int totalBlocos = n / 10 + 1; // Número arbitrário de blocos baseado em n
+        int totalBlocos = n / 50; // Número arbitrário de blocos baseado em n
 
         // Criar Blocos
         for (int i = 1; i <= totalBlocos; i++) {
@@ -76,17 +76,17 @@ public class GerenciaDadosAleatorios {
         // Criar Celas em cada Bloco
         int celaId = 1;
         for (int blocoId = 1; blocoId <= totalBlocos; blocoId++) {
-            int numCelasPorBloco = 2 + random.nextInt(3); // Entre 2 e 4 celas por bloco
+            int numCelasPorBloco = 2 + random.nextInt(8); // Entre 2 e 4 celas por bloco
 
             for (int j = 0; j < numCelasPorBloco; j++) {
-                int capacidadeMaxima = 2 + random.nextInt(5); // Capacidade entre 2 e 6
+                int capacidadeMaxima = 2 + random.nextInt(25); // Capacidade entre 2 e 6
                 String nivelSeguranca = random.nextBoolean() ? "ALTA" : "MEDIA";
                 GerenciaCelas.cadastrarCela(blocoId, celaId++, capacidadeMaxima, nivelSeguranca);
             }
         }
 
         // Criar Guardas
-        for (int i = 1; i <= n / 5; i++) { // Guardas serão aproximadamente n/5
+        for (int i = 1; i <= n / 10; i++) { // Guardas serão aproximadamente n/5
             int blocoId = 1 + random.nextInt(totalBlocos);
             String nome = NOMES_GUARDAS.get(random.nextInt(NOMES_GUARDAS.size())) + " " + SOBRENOMES.get(random.nextInt(SOBRENOMES.size())) + " " + SOBRENOMES.get(random.nextInt(SOBRENOMES.size()));
             String turno = TURNOS.get(random.nextInt(TURNOS.size()));

@@ -1,7 +1,7 @@
 package com.prisao.controle.gerenciamento.pessoa;
 
 import com.prisao.controle.gerenciamento.local.GerenciaBlocos;
-import com.prisao.controle.persistencia.BackupManager;
+import com.prisao.controle.persistencia.implementacaoDAO.PrisaoDAO;
 import com.prisao.modelo.local.Bloco;
 import com.prisao.modelo.local.Prisao;
 import com.prisao.modelo.pessoa.Guarda;
@@ -32,7 +32,7 @@ public class GerenciaGuardas {
         }
 
         bloco.insereGuarda(new Guarda(identificadorGuarda, nome, turno, cargo));
-        BackupManager.salvarBackup(Prisao.getInstancia());
+        PrisaoDAO.getInstance().salvar(Prisao.getInstancia());
 
         return true;
     }
@@ -45,7 +45,7 @@ public class GerenciaGuardas {
 
         for(Bloco blocoAtual : Prisao.getInstancia().getBlocos()){
             if(blocoAtual.removeGuarda(identificador)){
-                BackupManager.salvarBackup(Prisao.getInstancia());
+                PrisaoDAO.getInstance().salvar(Prisao.getInstancia());
                 return true;
             }
         }
@@ -65,7 +65,7 @@ public class GerenciaGuardas {
             Guarda guardaAux = new Guarda(guarda.getIdentificador(), guarda.getNome(), guarda.getTurno(), guarda.getCargo());
             desvincularGuarda(identificadorGuarda);
             cadastrarGuarda(guardaAux.getIdentificador(), identificadorNovoBloco, guardaAux.getNome(), guardaAux.getTurno(), guardaAux.getCargo());
-            BackupManager.salvarBackup(Prisao.getInstancia());
+            PrisaoDAO.getInstance().salvar(Prisao.getInstancia());
             return true;
         }
 

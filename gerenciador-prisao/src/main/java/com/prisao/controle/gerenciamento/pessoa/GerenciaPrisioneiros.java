@@ -1,13 +1,23 @@
 package com.prisao.controle.gerenciamento.pessoa;
 
 import com.prisao.controle.gerenciamento.local.GerenciaCelas;
-import com.prisao.controle.persistencia.BackupManager;
+import com.prisao.controle.persistencia.implementacaoDAO.PrisaoDAO;
+import com.prisao.controle.strategy.PrisioneiroStrategy;
 import com.prisao.modelo.local.Bloco;
 import com.prisao.modelo.local.Cela;
 import com.prisao.modelo.local.Prisao;
 import com.prisao.modelo.pessoa.Prisioneiro;
 
 public class GerenciaPrisioneiros {
+
+    public static boolean aplicarEstrategiaPrisioneiro(int identificador, PrisioneiroStrategy estrategia) {
+        Prisioneiro prisioneiro = pesquisarPrisioneiro(identificador);
+        if (prisioneiro == null) {
+            return false;
+        }
+        return estrategia.aplicarEstrategia(prisioneiro);
+    }
+
     public static Prisioneiro pesquisarPrisioneiro(int identificador){
         for(Bloco blocoAtual : Prisao.getInstancia().getBlocos()){
             for(Cela celaATual : blocoAtual.getCelas()){
@@ -34,7 +44,7 @@ public class GerenciaPrisioneiros {
         }
         
         cela.inserePrisioneiro(new Prisioneiro(identificadorPrisioneiro, nome, crime, pena, comportamento));
-        BackupManager.salvarBackup(Prisao.getInstancia());
+        PrisaoDAO.getInstance().salvar(Prisao.getInstancia());
 
         return true;
     }
@@ -48,7 +58,7 @@ public class GerenciaPrisioneiros {
         for(Bloco blocoAtual : Prisao.getInstancia().getBlocos()){
             for(Cela celaAtual : blocoAtual.getCelas()){
                 if(celaAtual.removePrisioneiro(identificador)){
-                    BackupManager.salvarBackup(Prisao.getInstancia());
+                    PrisaoDAO.getInstance().salvar(Prisao.getInstancia());
                     return true;
                 }
             }
@@ -69,7 +79,7 @@ public class GerenciaPrisioneiros {
             Prisioneiro prisioAux = new Prisioneiro(prisioneiro.getIdentificador(), prisioneiro.getNome(), prisioneiro.getCrime(), prisioneiro.getPena(), prisioneiro.getComportamento());
             desvincularPrisioneiro(identificadorPrisioneiro);
             cadastrarPrisioneiro(prisioAux.getIdentificador(), identificadorNovaCela, prisioAux.getNome(), prisioAux.getCrime(), prisioAux.getPena(), prisioAux.getComportamento());
-            BackupManager.salvarBackup(Prisao.getInstancia());
+            PrisaoDAO.getInstance().salvar(Prisao.getInstancia());
             return true;
         }
 
@@ -83,7 +93,7 @@ public class GerenciaPrisioneiros {
         }
 
         prisioneiro.setComportamento(novoComportamento);
-        BackupManager.salvarBackup(Prisao.getInstancia());
+        PrisaoDAO.getInstance().salvar(Prisao.getInstancia());
         return true;
     }
 
@@ -94,7 +104,7 @@ public class GerenciaPrisioneiros {
         }
 
         prisioneiro.setPena(prisioneiro.getPena() + valorAumentoPena);
-        BackupManager.salvarBackup(Prisao.getInstancia());
+        PrisaoDAO.getInstance().salvar(Prisao.getInstancia());
         return true;
     }
 
@@ -109,7 +119,7 @@ public class GerenciaPrisioneiros {
         if(prisioneiro.getPena() < 0.0){
             System.out.println("Prisioneiro " + prisioneiro.getNome() + " já cumpriu sua pena, portanto será removido do sistema.");
             desvincularPrisioneiro(identificadorPrisioneiro);
-            BackupManager.salvarBackup(Prisao.getInstancia());
+            PrisaoDAO.getInstance().salvar(Prisao.getInstancia());
         }
 
         return true;

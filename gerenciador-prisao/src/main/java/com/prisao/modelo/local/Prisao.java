@@ -3,7 +3,7 @@ package com.prisao.modelo.local;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.prisao.controle.persistencia.BackupManager;
+import com.prisao.controle.persistencia.implementacaoDAO.PrisaoDAO;
 import com.prisao.modelo.pessoa.Delegado;
 
 public class Prisao {
@@ -23,7 +23,7 @@ public class Prisao {
 
     public static Prisao getInstancia() {
         if (instanciaUnica == null) {
-            instanciaUnica = BackupManager.carregarBackup();
+            instanciaUnica = PrisaoDAO.getInstance().carregar();
             
             if (instanciaUnica == null) {
                 instanciaUnica = new Prisao();

@@ -13,10 +13,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.prisao.controle.gerenciamento.pessoa.GerenciaPrisioneiros;
+import com.prisao.controle.strategy.estrategia.AumentarPenaStrategy;
+import com.prisao.controle.strategy.estrategia.DiminuirPenaStrategy;
+import com.prisao.controle.strategy.estrategia.MudarComportamentoStrategy;
 import com.prisao.modelo.pessoa.Prisioneiro;
 
 public class GerenciaPrisioneirosUI extends JFrame {
@@ -34,10 +38,26 @@ public class GerenciaPrisioneirosUI extends JFrame {
 
         setLocationRelativeTo(null);
 
-        setLayout(new BorderLayout());
+        // Usando JTabbedPane para organizar as abas
+        JTabbedPane tabbedPane = new JTabbedPane();
 
+        // Aba de Gerenciamento de Prisioneiros
+        tabbedPane.addTab("Prisioneiros", createPrisioneirosPanel());
+
+        // Aba de Operações de Pena e Comportamento (Strategy)
+        tabbedPane.addTab("Operações de Pena", createOperacoesPanel());
+
+        // Adiciona o JTabbedPane à janela principal
+        add(tabbedPane, BorderLayout.CENTER);
+
+        setVisible(true);
+    }
+
+    // Cria o painel de gerenciamento de prisioneiros
+    private JPanel createPrisioneirosPanel() {
         JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
 
+        // Painel de Pesquisa (existente)
         JPanel pesquisarPanel = new JPanel(new BorderLayout());
         pesquisarPanel.setBorder(BorderFactory.createTitledBorder("Pesquisar Prisioneiro"));
 
@@ -75,6 +95,7 @@ public class GerenciaPrisioneirosUI extends JFrame {
 
         panel.add(pesquisarPanel);
 
+        // Painel de Cadastro (existente)
         JPanel cadastrarPanel = new JPanel(new GridLayout(7, 2, 10, 10));
         cadastrarPanel.setBorder(BorderFactory.createTitledBorder("Cadastrar Prisioneiro"));
 
@@ -131,6 +152,7 @@ public class GerenciaPrisioneirosUI extends JFrame {
 
         panel.add(cadastrarPanel);
 
+        // Painel de Desvincular (existente)
         JPanel desvincularPanel = new JPanel(new FlowLayout());
         desvincularPanel.setBorder(BorderFactory.createTitledBorder("Desvincular Prisioneiro"));
         JTextField txtDesvincularId = new JTextField(10);
@@ -148,7 +170,7 @@ public class GerenciaPrisioneirosUI extends JFrame {
                 lblDesvincularResultado.setText(sucesso ? "Prisioneiro desvinculado com sucesso!" : "Falha ao desvincular prisioneiro.");
             } catch (NumberFormatException ex) {
                 lblDesvincularResultado.setText("ID inválido.");
-            }finally{
+            } finally {
                 txtDesvincularId.setText("");
             }
 
@@ -159,6 +181,7 @@ public class GerenciaPrisioneirosUI extends JFrame {
 
         panel.add(desvincularPanel);
 
+        // Painel de Transferir (existente)
         JPanel transferirPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         transferirPanel.setBorder(BorderFactory.createTitledBorder("Transferir Prisioneiro"));
 
@@ -195,9 +218,106 @@ public class GerenciaPrisioneirosUI extends JFrame {
 
         panel.add(transferirPanel);
 
-        add(panel, BorderLayout.CENTER);
+        return panel;
+    }
 
-        setVisible(true);
+    private JPanel createOperacoesPanel() {
+        JPanel operacoesPanel = new JPanel(new BorderLayout(10, 10)); // Layout principal
+        operacoesPanel.setBorder(BorderFactory.createTitledBorder("Operações de Pena e Comportamento"));
+    
+        // Painel para os campos de entrada
+        JPanel inputPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Margens internas
+    
+        JTextField txtOperacaoId = new JTextField();
+        JTextField txtValorPena = new JTextField();
+        JTextField txtNovoComportamento = new JTextField();
+    
+        inputPanel.add(new JLabel("ID do Prisioneiro:"));
+        inputPanel.add(txtOperacaoId);
+        inputPanel.add(new JLabel("Valor da Pena:"));
+        inputPanel.add(txtValorPena);
+        inputPanel.add(new JLabel("Novo Comportamento:"));
+        inputPanel.add(txtNovoComportamento);
+    
+        // Painel para os botões
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Margens internas
+    
+        JButton btnAumentarPena = new JButton("Aumentar Pena");
+        JButton btnDiminuirPena = new JButton("Diminuir Pena");
+        JButton btnMudarComportamento = new JButton("Mudar Comportamento");
+    
+        buttonPanel.add(btnAumentarPena);
+        buttonPanel.add(btnDiminuirPena);
+        buttonPanel.add(btnMudarComportamento);
+    
+        // Painel para o resultado da operação
+        JLabel lblOperacaoResultado = new JLabel(" ");
+        lblOperacaoResultado.setHorizontalAlignment(JLabel.CENTER); // Centraliza o texto
+        lblOperacaoResultado.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Margens internas
+    
+        // Adiciona os painéis ao painel principal
+        operacoesPanel.add(inputPanel, BorderLayout.NORTH);
+        operacoesPanel.add(buttonPanel, BorderLayout.CENTER);
+        operacoesPanel.add(lblOperacaoResultado, BorderLayout.SOUTH);
+    
+        // Lógica dos botões
+        btnAumentarPena.addActionListener(e -> {
+            try {
+                int id = Integer.parseInt(txtOperacaoId.getText());
+                float valor = Float.parseFloat(txtValorPena.getText());
+                boolean sucesso = GerenciaPrisioneiros.aplicarEstrategiaPrisioneiro(id, new AumentarPenaStrategy(valor));
+                lblOperacaoResultado.setText(sucesso ? "Pena aumentada com sucesso!" : "Falha ao aumentar pena.");
+            } catch (NumberFormatException ex) {
+                lblOperacaoResultado.setText("Dados inválidos.");
+            } finally {
+                txtOperacaoId.setText("");
+                txtValorPena.setText("");
+            }
+    
+            javax.swing.Timer timer = new javax.swing.Timer(3000, ev -> lblOperacaoResultado.setText(" "));
+            timer.setRepeats(false);
+            timer.start();
+        });
+    
+        btnDiminuirPena.addActionListener(e -> {
+            try {
+                int id = Integer.parseInt(txtOperacaoId.getText());
+                float valor = Float.parseFloat(txtValorPena.getText());
+                boolean sucesso = GerenciaPrisioneiros.aplicarEstrategiaPrisioneiro(id, new DiminuirPenaStrategy(valor));
+                lblOperacaoResultado.setText(sucesso ? "Pena diminuída com sucesso!" : "Falha ao diminuir pena.");
+            } catch (NumberFormatException ex) {
+                lblOperacaoResultado.setText("Dados inválidos.");
+            } finally {
+                txtOperacaoId.setText("");
+                txtValorPena.setText("");
+            }
+    
+            javax.swing.Timer timer = new javax.swing.Timer(3000, ev -> lblOperacaoResultado.setText(" "));
+            timer.setRepeats(false);
+            timer.start();
+        });
+    
+        btnMudarComportamento.addActionListener(e -> {
+            try {
+                int id = Integer.parseInt(txtOperacaoId.getText());
+                String comportamento = txtNovoComportamento.getText();
+                boolean sucesso = GerenciaPrisioneiros.aplicarEstrategiaPrisioneiro(id, new MudarComportamentoStrategy(comportamento));
+                lblOperacaoResultado.setText(sucesso ? "Comportamento alterado com sucesso!" : "Falha ao alterar comportamento.");
+            } catch (NumberFormatException ex) {
+                lblOperacaoResultado.setText("Dados inválidos.");
+            } finally {
+                txtOperacaoId.setText("");
+                txtNovoComportamento.setText("");
+            }
+    
+            javax.swing.Timer timer = new javax.swing.Timer(3000, ev -> lblOperacaoResultado.setText(" "));
+            timer.setRepeats(false);
+            timer.start();
+        });
+    
+        return operacoesPanel;
     }
 
     private String formatarDadosPrisioneiro(Prisioneiro prisioneiro) {
