@@ -45,7 +45,7 @@ public class GerenciaPrisioneirosUI extends JFrame {
         tabbedPane.addTab("Prisioneiros", createPrisioneirosPanel());
 
         // Aba de Operações de Pena e Comportamento (Strategy)
-        tabbedPane.addTab("Operações de Pena", createOperacoesPanel());
+        tabbedPane.addTab("Operações de Pena e Comportamento", createOperacoesPanel());
 
         // Adiciona o JTabbedPane à janela principal
         add(tabbedPane, BorderLayout.CENTER);
